@@ -75,19 +75,25 @@ public class UserController {
         if (userOptional.isPresent()) {
             model.addAttribute("user", userOptional.get());
             return "change-password";
-        } else {
-            return "redirect:/admin";
         }
+        return "redirect:/admin";
     }
 
+
     @PostMapping("admin/change-password")
-    public String changePassword(@RequestParam String username, @RequestParam String newPassword) {
-        Optional<User> userOptional = userService.findByUsername(username);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setPassword((newPassword));
-            userService.saveUser(user);
+    public String changePassword(@ModelAttribute("user") @Valid User user,
+                                 BindingResult bindingResult, Model model) {
+        if (bindingResult.hasFieldErrors("password")) {
+            return "change-password";
         }
+
+        Optional<User> userOptional = userService.findByUsername(user.getUsername());
+        if (userOptional.isPresent()) {
+            User existingUser = userOptional.get();
+            existingUser.setPassword(user.getPassword());
+            userService.saveUser(existingUser);
+        }
+
         return "redirect:/admin";
     }
     @GetMapping("admin/edit/{username}")
