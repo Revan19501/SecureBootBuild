@@ -21,7 +21,7 @@ import java.util.*;
 public class UserController {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     UserController(RoleRepository roleRepository, UserService userService, UserRepository userRepository) {

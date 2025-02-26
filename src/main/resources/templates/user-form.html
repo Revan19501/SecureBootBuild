@@ -45,8 +45,10 @@
         <input type="password" class="form-control" th:field="*{password}"
                th:attr="required=${user.id == null}"/>
 
-        <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+        <!-- Сообщение об ошибке, если поле пароля не заполнено -->
+        <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:text="'Введите пароль для подтверждения действия'"></div>
     </div>
+
 
 
     <div class="mb-3">
