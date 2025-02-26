@@ -69,7 +69,27 @@ public class UserController {
         model.addAttribute("allRoles", roleRepository.findAll());
         return "user-form";
     }
+    @GetMapping("admin/change-password/{username}")
+    public String showChangePasswordForm(@PathVariable String username, Model model) {
+        Optional<User> userOptional = userService.findByUsername(username);
+        if (userOptional.isPresent()) {
+            model.addAttribute("user", userOptional.get());
+            return "change-password";
+        } else {
+            return "redirect:/admin";
+        }
+    }
 
+    @PostMapping("admin/change-password")
+    public String changePassword(@RequestParam String username, @RequestParam String newPassword) {
+        Optional<User> userOptional = userService.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setPassword((newPassword));
+            userService.saveUser(user);
+        }
+        return "redirect:/admin";
+    }
     @GetMapping("admin/edit/{username}")
     public String showEditUserForm(@PathVariable String username, Model model) {
         Optional<User> userOptional = userService.findByUsername(username);

@@ -21,7 +21,6 @@
     <thead class="table-dark">
     <tr>
         <th>Логин</th>
-        <th>Пароль</th>
         <th>Активен</th>
         <th>Имя</th>
         <th>Фамилия</th>
@@ -32,7 +31,6 @@
     <tbody>
     <tr th:each="user : ${users}">
         <td th:text="${user.username}"></td>
-        <td>*****</td>
         <td>
             <span th:text="${user.enabled} ? 'Да' : 'Нет'" class="badge"
                   th:classappend="${user.enabled} ? 'bg-success' : 'bg-danger'"></span>
@@ -42,6 +40,7 @@
         <td th:text="${user.age != null ? user.age : 'Не указан'}"></td>
         <td>
             <a th:href="@{/admin/edit/{username}(username=${user.username})}" class="btn btn-warning btn-sm">Редактировать</a>
+            <a th:href="@{/admin/change-password/{username}(username=${user.username})}" class="btn btn-info btn-sm">Изменить пароль</a>
             <a th:href="@{/admin/delete/{username}(username=${user.username})}"
                class="btn btn-danger btn-sm"
                onclick="return confirm('Удалить?')">Удалить</a>

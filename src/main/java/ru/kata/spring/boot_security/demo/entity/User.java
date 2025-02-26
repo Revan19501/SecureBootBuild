@@ -51,11 +51,12 @@ public class User implements UserDetails {
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
 
-    @Size(min = 1, message = "Логин не должно быть пустым")
+    @Size(min = 1, message = "Логин не должен быть пустым")
     @Pattern(regexp = "^(|[A-Za-z0-9]+)$", message = "Логин должен содержать только буквы латинского альфавита")
     @Column(name = "username")
     private String username;
 
+    @Size(min = 8, message = "Пароль должен состоять из 8 символов и больше")
     @Column(name = "password")
     private String password;
 
