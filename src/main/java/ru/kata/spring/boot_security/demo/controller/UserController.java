@@ -4,6 +4,7 @@ package ru.kata.spring.boot_security.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,18 +17,22 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class UserController {
+
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    UserController(RoleRepository roleRepository, UserService userService, UserRepository userRepository) {
+    UserController(RoleRepository roleRepository, UserService userService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.roleRepository = roleRepository;
         this.userService = userService;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping()
@@ -96,11 +101,13 @@ public class UserController {
             return "user-form";
         }
 
+
         if (userService.existsByUsername(user.getUsername(), user.getId())) {
             bindingResult.rejectValue("username", "error.user", "Этот логин уже используется!");
             model.addAttribute("allRoles", roleRepository.findAll());
             return "user-form";
         }
+
 
         User userToSave = user.getId() != null ? userService.findById(user.getId()).orElse(new User()) : new User();
 
@@ -111,23 +118,35 @@ public class UserController {
         userToSave.setUsername(user.getUsername());
 
 
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            userToSave.setPassword(user.getPassword());
+        if (user.getId() != null) {
+            User existingUser = userService.findById(user.getId()).orElse(null);
+
+            if (existingUser != null) {
+                if (user.getPassword() == null || user.getPassword().isEmpty()) {
+                    userToSave.setPassword(existingUser.getPassword());
+                } else {
+                    userToSave.setPassword((user.getPassword()));
+                }
+            } else {
+                userToSave.setPassword((user.getPassword()));
+            }
+        } else {
+            userToSave.setPassword((user.getPassword()));
         }
 
+
         if (roleIds != null && !roleIds.isEmpty()) {
-            Set<Role> roles = new HashSet<>();
-            for (Long roleId : roleIds) {
-                Role role = roleRepository.findById(roleId)
-                        .orElseThrow(() -> new RuntimeException("Role not found"));
-                roles.add(role);
-            }
+            Set<Role> roles = roleIds.stream()
+                    .map(roleId -> roleRepository.findById(roleId)
+                            .orElseThrow(() -> new RuntimeException("Роль не найдена")))
+                    .collect(Collectors.toSet());
             userToSave.setRoles(roles);
         }
 
         userService.saveUser(userToSave);
         return "redirect:/admin";
     }
+
 
 
     @GetMapping("/403")

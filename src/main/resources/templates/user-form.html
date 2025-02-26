@@ -21,40 +21,41 @@
     <div class="mb-3">
         <label class="form-label">Имя:</label>
         <input type="text" class="form-control" th:field="*{name}" required/>
-
         <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Фамилия:</label>
         <input type="text" class="form-control" th:field="*{lastName}"/>
-
         <div class="text-danger" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Логин:</label>
         <input type="text" class="form-control" th:field="*{username}" required/>
-
         <div class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
     </div>
 
-
-    <div class="mb-3">
+    <!-- Блок для нового пользователя -->
+    <div class="mb-3" th:if="${user.id == null}">
         <label class="form-label">Пароль:</label>
-        <input type="password" class="form-control" th:field="*{password}"
-               th:attr="required=${user.id == null}"/>
-
-        <!-- Сообщение об ошибке, если поле пароля не заполнено -->
-        <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:text="'Введите пароль для подтверждения действия'"></div>
+        <input type="password" class="form-control" th:field="*{password}" required/>
+        <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:text="'Введите пароль'"></div>
     </div>
 
-
+    <!-- Блок для редактирования пользователя -->
+    <div class="mb-3" th:if="${user.id != null}">
+        <label class="form-label">Пароль:</label>
+        <button type="button" class="btn btn-outline-secondary"
+                onclick="document.getElementById('passwordField').style.display='block'; this.style.display='none';">
+            Изменить пароль
+        </button>
+        <input type="password" id="passwordField" class="form-control mt-2" th:field="*{password}" style="display: none;"/>
+    </div>
 
     <div class="mb-3">
         <label class="form-label">Возраст:</label>
         <input type="number" class="form-control" th:field="*{age}" min="13" required/>
-
         <div class="text-danger" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
     </div>
 

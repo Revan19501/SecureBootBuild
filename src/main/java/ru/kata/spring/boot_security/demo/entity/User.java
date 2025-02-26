@@ -25,6 +25,10 @@ public class User implements UserDetails {
     private Set<Role> roles = new HashSet<>();
 
 
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -52,7 +56,6 @@ public class User implements UserDetails {
     @Column(name = "username")
     private String username;
 
-    @Size(min = 1, message = "Введите пароль для подтверждения действия")
     @Column(name = "password")
     private String password;
 
