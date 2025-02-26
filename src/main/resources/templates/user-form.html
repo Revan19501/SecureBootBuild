@@ -42,8 +42,12 @@
 
     <div class="mb-3">
         <label class="form-label">Пароль:</label>
-        <input type="password" class="form-control" th:field="*{password}" />
+        <input type="password" class="form-control" th:field="*{password}"
+               th:attr="required=${user.id == null}"/>
+
+        <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
     </div>
+
 
     <div class="mb-3">
         <label class="form-label">Возраст:</label>

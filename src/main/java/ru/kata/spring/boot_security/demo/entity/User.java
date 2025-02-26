@@ -1,6 +1,5 @@
 package ru.kata.spring.boot_security.demo.entity;
 
-import org.jetbrains.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -53,6 +52,8 @@ public class User implements UserDetails {
     @Column(name = "username")
     private String username;
 
+
+    @Column(name = "password")
     private String password;
 
     public Integer getAge() {
@@ -97,6 +98,11 @@ public class User implements UserDetails {
         return true;
     }
 
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     public Set<Role> getRoles() {
         return roles;
     }
@@ -137,9 +143,6 @@ public class User implements UserDetails {
         this.username = username;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+
 
 }

@@ -110,6 +110,7 @@ public class UserController {
         userToSave.setEnabled(user.isEnabled());
         userToSave.setUsername(user.getUsername());
 
+
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             userToSave.setPassword(user.getPassword());
         }

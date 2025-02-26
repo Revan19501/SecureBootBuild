@@ -59,8 +59,10 @@ public class UserService implements UserDetailsService {
         Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
 
         if (existingUser.isPresent()) {
+
             User dbUser = existingUser.get();
             dbUser.setRoles(user.getRoles());
+
 
             if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                 dbUser.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -68,11 +70,11 @@ public class UserService implements UserDetailsService {
 
             userRepository.save(dbUser);
         } else {
-
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
         }
     }
+
 
     @Transactional
     public void deleteUser(String username) {
