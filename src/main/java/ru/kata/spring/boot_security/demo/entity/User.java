@@ -11,23 +11,11 @@ import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
-
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,39 +40,38 @@ public class User implements UserDetails {
     private boolean enabled;
 
     @Size(min = 1, message = "Логин не должен быть пустым")
-    @Pattern(regexp = "^(|[A-Za-z0-9]+)$", message = "Логин должен содержать только буквы латинского альфавита")
-    @Column(name = "username")
+    @Pattern(regexp = "^(|[A-Za-z0-9]+)$", message = "Логин должен содержать только буквы латинского алфавита")
+    @Column(name = "username", unique = true)
     private String username;
 
     @Size(min = 8, message = "Пароль должен состоять из 8 символов и больше")
     @Column(name = "password")
     private String password;
 
-    public Integer getAge() {
-        return age != null ? age : 0;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+
+    public User() {
     }
 
-    public void setAge(int age) {
+    public User(String username, String password, String name, String lastName, Integer age, boolean enabled) {
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.lastName = lastName;
         this.age = age;
-    }
-
-    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
     }
 
     @Override
@@ -104,35 +91,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return enabled;
     }
 
     public Long getId() {
@@ -143,10 +102,84 @@ public class User implements UserDetails {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public Integer getAge() {
+        return age != null ? age : 0;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", age=" + age +
+                ", enabled=" + enabled +
+                ", roles=" + roles +
+                '}';
+    }
 }
