@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -37,14 +38,14 @@ public class User implements UserDetails {
     private Integer age;
 
     @Column(name = "enabled", nullable = false)
-    private boolean enabled;
+    private boolean enabled = true;
 
     @Size(min = 1, message = "Логин не должен быть пустым")
     @Pattern(regexp = "^(|[A-Za-z0-9]+)$", message = "Логин должен содержать только буквы латинского алфавита")
     @Column(name = "username", unique = true)
     private String username;
 
-    @Size(min = 8, message = "Пароль должен состоять из 8 символов и больше")
+    //@Size(min = 8, message = "Пароль должен состоять из 8 символов и больше")
     @Column(name = "password")
     private String password;
 
@@ -58,6 +59,7 @@ public class User implements UserDetails {
 
 
     public User() {
+        this.enabled = true;
     }
 
     public User(String username, String password, String name, String lastName, Integer age, boolean enabled) {
@@ -72,6 +74,12 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
+    }
+
+    public String rolesToString() {
+        return roles.stream()
+                .map(Role::getAuthority)
+                .collect(Collectors.joining(", "));
     }
 
     @Override

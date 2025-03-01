@@ -6,12 +6,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.entity.Role;
 import ru.kata.spring.boot_security.demo.entity.User;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -43,14 +43,46 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean existsByUsername(String username, Long id) {
-        Optional<User> existingUser = userRepository.findByUsername(username);
-        return existingUser.isPresent() && !existingUser.get().getId().equals(id);
+        return userRepository.findByUsername(username)
+                .map(user -> !user.getId().equals(id))
+                .orElse(false);
+    }
+
+    @Transactional
+    public void updateUser(Long id, User user, List<Long> roleIds) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        existingUser.setName(user.getName());
+        existingUser.setLastName(user.getLastName());
+        existingUser.setAge(user.getAge());
+        existingUser.setEnabled(user.isEnabled());
+        existingUser.setUsername(user.getUsername());
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
+        if (roleIds != null && !roleIds.isEmpty()) {
+            Set<Role> roles = roleIds.stream()
+                    .map(roleRepository::findById)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toSet());
+            existingUser.setRoles(roles);
+        }
+
+        userRepository.save(existingUser);
     }
 
     @Transactional
     public void saveUser(User user, List<Long> roleIds) {
+        if (user.getId() == null && existsByUsername(user.getUsername(), null)) {
+            throw new RuntimeException("Пользователь с таким именем уже существует");
+        }
+
         User userToSave = user.getId() != null ? findById(user.getId()).orElse(new User()) : new User();
 
         userToSave.setName(user.getName());
@@ -85,8 +117,13 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(userToSave);
     }
+
     @Transactional
     public void changePassword(String username, String newPassword) {
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw new IllegalArgumentException("Пароль не может быть пустым");
+        }
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
@@ -95,8 +132,10 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void deleteUser(String username) {
-        userRepository.findByUsername(username).ifPresent(userRepository::delete);
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        userRepository.delete(user);
     }
 
     @Override
@@ -106,4 +145,5 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return user;
     }
+
 }
