@@ -41,10 +41,10 @@ public class AdminController {
     @GetMapping("/edit/{id}")
     public String showEditUserForm(@PathVariable Long id, Model model) {
         userService.findById(id).ifPresent(user -> {
-            model.addAttribute("user", user); // Передаем объект пользователя в модель
-            model.addAttribute("roles", roleService.getAllRoles()); // Передаем список ролей
+            model.addAttribute("user", user);
+            model.addAttribute("roles", roleService.getAllRoles());
         });
-        return "admin"; // Возвращаем страницу admin.html
+        return "admin";
     }
 
 
@@ -63,14 +63,14 @@ public class AdminController {
                            @AuthenticationPrincipal User authUser) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("roles", roleService.getAllRoles());
-            model.addAttribute("activeTab", "newUser"); // Устанавливаем активную вкладку
-            return "admin"; // Возвращаем страницу с ошибками
+            model.addAttribute("activeTab", "newUser");
+            return "admin";
         }
 
         if (userService.existsByUsername(user.getUsername(), user.getId())) {
             bindingResult.rejectValue("username", "error.user", "Этот логин уже используется!");
             model.addAttribute("roles", roleService.getAllRoles());
-            model.addAttribute("activeTab", "newUser"); // Устанавливаем активную вкладку
+            model.addAttribute("activeTab", "newUser");
             return "admin";
         }
 
@@ -91,7 +91,7 @@ public class AdminController {
             // Передаем ошибки валидации и ID пользователя для открытия модального окна
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", bindingResult);
             redirectAttributes.addFlashAttribute("user", user);
-            redirectAttributes.addFlashAttribute("openEditModal", true); // Флаг для открытия модального окна
+            redirectAttributes.addFlashAttribute("openEditModal", true);
             return "redirect:/admin";
         }
 
