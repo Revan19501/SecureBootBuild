@@ -47,39 +47,12 @@ public class AdminController {
         return "admin"; // Возвращаем страницу admin.html
     }
 
-    @GetMapping("/change-password/{username}")
-    public String showChangePasswordForm(@PathVariable String username, Model model) {
-        userService.findByUsername(username)
-                .ifPresent(user -> model.addAttribute("user", user));
-        return "change-password";
-    }
 
     @ModelAttribute("authUser")
     public User getAuthUser(@AuthenticationPrincipal User authUser) {
         return authUser;
     }
 
-    @PostMapping("/change-password/{username}")
-    public String changePassword(@PathVariable String username,
-                                 @RequestParam("password") String password,
-                                 @RequestParam("confirmPassword") String confirmPassword,
-                                 Model model) {
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "Пароли не совпадают!");
-            return "change-password";
-        }
-
-        userService.changePassword(username, password);
-        return "redirect:/admin";
-    }
-
-
-    @GetMapping("/new")
-    public String showNewUserForm(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("roles", roleService.getAllRoles());
-        return "user-form";
-    }
 
     @PostMapping("/save")
     public String saveUser(@Valid @ModelAttribute("user") User user,

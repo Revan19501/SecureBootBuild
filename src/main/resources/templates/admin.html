@@ -205,10 +205,24 @@
                                                             <input th:name="id" th:type="text" class="form-control"
                                                                    id="id1" th:value="*{id}" disabled/>
                                                             <br>
-                                                            <label for="username1"><b>Name</b></label>
+                                                            <label for="username1"><b>Username</b></label>
                                                             <input th:name="username" th:type="text"
                                                                    class="form-control" id="username1"
-                                                                   th:value="*{username}"/>
+                                                                   th:value="*{username}" disabled/>
+                                                            <br>
+                                                            <label for="name1"><b>Name</b></label>
+                                                            <input th:name="name" th:type="text"
+                                                                   class="form-control" id="name1"
+                                                                   th:value="*{name}" disabled/>
+                                                            <br>
+                                                            <label for="username1"><b>Last Name</b></label>
+                                                            <input th:name="lastName" th:type="text"
+                                                                   class="form-control" id="lastName1"
+                                                                   th:value="*{lastName}" disabled/>
+                                                            <br> <label for="age1"><b>Age</b></label>
+                                                            <input th:name="age" th:type="text"
+                                                                   class="form-control" id="age1"
+                                                                   th:value="*{age}" disabled>
                                                             <br>
                                                             <label><b>Role</b></label>
                                                             <select class="form-select"
